@@ -1,7 +1,10 @@
+#!/usr/bin/env python3
+
+''' Interface Dialog '''
+
 from tkinter import (Toplevel)
 from tkinter.ttk import (Style, Frame, Label, PanedWindow, Button, Combobox, Entry, Separator)
 from tkinter.constants import LEFT, SEL, INSERT, DISABLED, NORMAL, END, CENTER, YES, ACTIVE, SUNKEN, RIGHT
-
 from tkinter.messagebox import showerror
 
 from interface import (loadIcon, IIVLXICO, __version__)

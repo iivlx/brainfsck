@@ -1,21 +1,24 @@
+#!/usr/bin/env python3
+
+''' Main Window '''
+
+import time
+from math import floor
 from tkinter import Tk, ttk, TclError, StringVar
 from tkinter import PhotoImage
 from tkinter import (Toplevel, Menu, Text)
 from tkinter import filedialog
 from tkinter.ttk import (Style, Frame, Label, PanedWindow, Button, Combobox, Entry, Separator)
 from tkinter.constants import LEFT, SEL, INSERT, DISABLED, NORMAL, END, CENTER, YES, ACTIVE, SUNKEN, RIGHT, CURRENT
-from math import floor
 
 from interface import (__version__, loadIcon, IIVLXICO, About, MemoryView, SetExecutionDelay, SetMaximumCellValue)
-
-import time
 
 class Brainfsck(Frame):
     ''' Main window of the application    
     '''
     WINDOW_TITLE = "Brainfsck - iivlxsoft"
     WINDOW_WIDTH = 700
-    WINDOW_HEIGHT = 260
+    WINDOW_HEIGHT = 700
     WINDOW_WIDTH_MIN = 500
     WINDOW_HEIGHT_MIN = 250
     WINDOW_WIDTH_OFFSET = 100
@@ -26,8 +29,8 @@ class Brainfsck(Frame):
     engine = None
     execution_delay = 1
     allow_illegal_characters = True
-    inputBuffer = []
-    outputBuffer = []
+    input_buffer = []
+    output_buffer = []
     _reset_modifed = False #sponge
     execution_time_start = 0
     execution_time_end = 0
@@ -45,13 +48,8 @@ class Brainfsck(Frame):
         x = self.master.winfo_pointerx() - self.WINDOW_WIDTH_OFFSET
         y = self.master.winfo_pointery() - self.WINDOW_HEIGHT_OFFSET
         y = y if y > self.WINDOW_Y_MIN else self.WINDOW_Y_MIN  
-        self.master.geometry(
-            '{0:d}x{0:d}+{2:d}+{3:d}'.format(self.WINDOW_WIDTH,
-                                             self.WINDOW_HEIGHT,
-                                             x, y)
-        )
-        self.master.minsize(self.WINDOW_WIDTH_MIN,
-                            self.WINDOW_HEIGHT_MIN)
+        self.master.geometry(f'{self.WINDOW_WIDTH}x{self.WINDOW_HEIGHT}+{x}+{y}')
+        self.master.minsize(self.WINDOW_WIDTH_MIN, self.WINDOW_HEIGHT_MIN)
         # configure master grid
         self.master.grid_rowconfigure(0, weight=1)
         self.master.grid_columnconfigure(0, weight=1)
@@ -108,13 +106,12 @@ class Brainfsck(Frame):
         startStopButton.grid(row=2, column=0)
         stepButton = Button(self, text="Step", command = lambda : self.step())
         stepButton.grid(row=2, column=1)
-        resetButton = Button(self, text="Reset", command = lambda : self.reset())
+        resetButton = Button(self, text="Reset/Load", command = lambda : self.reset())
         resetButton.grid(row=2, column=2)
         quitButton = Button(self, text="Quit")
         quitButton.config(command = lambda : self.close())
         quitButton.grid(row=2, column=3)
         
-    
     def drawStatusBar(self):
         self.statusBar = Label(self, text='Instruction Pointer: 0, Memory Pointer: 0, Memory Value: 0')
         self.statusBar.grid(row=3,column=0, columnspan=4, sticky='ews')
@@ -172,17 +169,13 @@ class Brainfsck(Frame):
         self.menubar_edit.add_command(label='Edit memory cell size')
         self.menubar_edit.add_command(label='Edit memory size')
         self.menubar_edit.add_command(label='Edit maximum memory cell value', command=self.showSetMaximumCellValue)
-        
-        
         return self.menubar_edit
-    
     
     def createMenubarView(self):
         ''' Create the View submen '''
         self.menubar_view = Menu(self.menubar, tearoff=0)
         self.menubar_view.add_command(label='Memory Block', command=self.showMemoryBlock)
         self.menubar_view.add_command(label='Memory Linear', command=self.showMemoryLinear)
-        
         return self.menubar_view                
 
     def createMenubarHelp(self):
@@ -192,6 +185,7 @@ class Brainfsck(Frame):
         return self.menubar_about
         
     def createContextMenu(self):
+        ''' Right click context menu '''
         self.contextMenu = Menu(self, tearoff=0)
         self.contextMenu.add_command(label='Set Breakpoint', command=self.setBreakpoint)
         self.contextMenu.add_command(label='Clear Breakpoint', command=self.clearBreakpoint)
@@ -216,10 +210,10 @@ class Brainfsck(Frame):
         self.memoryview = MemoryView(self)
         
     def stripCharacters(self, characters):
-        ''' remove charactesr from code input '''
+        ''' remove characters from code input '''
         # remember current cursor position
         cursor = self.codeInput.index(CURRENT)
-        # strip the code of non legal brainfuck characters
+        # strip the code of non legal brainfsck characters
         code = self.codeInput.get('1.0', END)        
         code = code.translate({ord(c): None for c in characters})
         # remove old code and insert stripped code and reset cursor
@@ -228,10 +222,10 @@ class Brainfsck(Frame):
         self.codeInput.mark_set('insert', cursor)
         
     def stripIllegalCharacters(self):
-        ''' Remove all non brainfuck characters from the code input'''
+        ''' Remove all non brainfsck characters from the code input'''
         # remember current cursor position
         cursor = self.codeInput.index(CURRENT)
-        # strip the code of non legal brainfuck characters
+        # strip the code of non legal brainfsck characters
         code = self.codeInput.get('1.0', END)        
         code = ''.join(filter(lambda x: x in ['\n', ' ', '.', ',', '+', '-', '>', '<', '[', ']'], code))
         # remove old code and insert stripped code and reset cursor
@@ -401,13 +395,13 @@ class Brainfsck(Frame):
         self.textInput.insert(END, event.char)
         self.textInput.config(state=DISABLED)
         
-        self.inputBuffer.append(event.char)
+        self.input_buffer.append(event.char)
         
         
     def getOutput(self):
-        if self.outputBuffer:
+        if self.output_buffer:
             self.textOutput.config(state=NORMAL)
-            self.textOutput.insert(END, self.outputBuffer.pop(0))
+            self.textOutput.insert(END, self.output_buffer.pop(0))
             self.textOutput.config(state=DISABLED)
         
     def loadEngine(self, engine):
@@ -423,15 +417,15 @@ class Brainfsck(Frame):
         self.engine.running = False
         self.running = False
         self.clearText()
-        self.inputBuffer = []
-        self.outputBuffer = []
-        self.engine.outputBuffer = self.outputBuffer
-        self.engine.inputBuffer = self.inputBuffer
+        self.input_buffer = []
+        self.output_buffer = []
+        self.engine.output_buffer = self.output_buffer
+        self.engine.input_buffer = self.input_buffer
         self.tagCurrentInstruction()
         self.execution_time_start = 0
         self.execution_time_end = 0
         self.execution_time_total = 0
-            #self.engine.run(input = self.inputBuffer, output = self.outputBuffer)
+            #self.engine.run(input = self.input_buffer, output = self.output_buffer)
         self.updateStatusBar()
         
     def close(self):

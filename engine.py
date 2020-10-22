@@ -1,7 +1,12 @@
 #!/usr/bin/env python3
+
+''' Brainfsck interpreter '''
+
 MEMORYSIZE = 65536
 DEFAULTCELLSIZE = 255
+
 class BrainfsckEngine:
+    ''' '''
     def __init__(self):
         self.memory = [0 for i in range(MEMORYSIZE)] # memory
         self.memorymaxvalue = DEFAULTCELLSIZE
@@ -10,25 +15,21 @@ class BrainfsckEngine:
         self.instruction_pointer = 0 # instruction pointer
         self.code = ""
         self.brackets = {}
-        self.outputBuffer = None # 
-        self.inputBuffer = None #
+        self.output_buffer = None # 
+        self.input_buffer = None #
         self.running = False
-    
-    
     
     def reset(self):
         self.instruction_pointer = 0
         self.memory = [0 for i in range(MEMORYSIZE)]
         self.memory_pointer = 0
         self.running = False
-        pass
     
-    def run(self, inBuffer = None, outBuffer = None, instruction_start = 0):
-        self.inputBuffer = inBuffer
-        self.outputBuffer = outBuffer
+    def run(self, in_buffer = None, out_buffer = None, instruction_start = 0):
+        self.input_buffer = in_buffer
+        self.output_buffer = out_buffer
         self.instruction_pointer = 0
         self.getBrackets()
-        
         
         self.running = True
         while self.instruction_pointer < len(self.code):
@@ -37,7 +38,6 @@ class BrainfsckEngine:
             self.executeInstruction(instruction)
             self.instruction_pointer += 1
         self.running = False
-        
         
     def step(self):
         if self.instruction_pointer == len(self.code):
@@ -71,7 +71,7 @@ class BrainfsckEngine:
             if b:
                 self.memory[self.memory_pointer] = b
             else:
-                self.instruction_pointer -=1
+                self.instruction_pointer -= 1
         elif instruction == '[':
             if self.memory[self.memory_pointer] == 0:
                 self.instruction_pointer = self.brackets[self.instruction_pointer]
@@ -83,20 +83,20 @@ class BrainfsckEngine:
             pass
         
     def output(self, character):
-        if self.outputBuffer == None:
+        if self.output_buffer == None:
             if character == 10:
                 print('\n',end='')
             else:
                 print(chr(character),end='')
         else:
-            self.outputBuffer.append(chr(character)) # add the character to the end of the buffer
+            self.output_buffer.append(chr(character)) # add the character to the end of the buffer
         
     def getInput(self):
-        if self.inputBuffer == None:
+        if self.input_buffer == None:
             return ord(input())
         else:
-            if self.inputBuffer:
-                return ord(self.inputBuffer.pop(0)) # read the first character of the input buffer
+            if self.input_buffer:
+                return ord(self.input_buffer.pop(0)) # read the first character of the input buffer
             else:
                 # we can't read a byte
                 return None
@@ -113,9 +113,7 @@ class BrainfsckEngine:
                 self.brackets[start] = position
                 self.brackets[position] = start
         
-        
-if __name__ == 'pyw':
+if __name__ == '__main__':
     bf = BrainfsckEngine()
-    
     bf.code = ",------------------------------------------------[->+++++[->+<]<]>>." # times by 5
     bf.run()

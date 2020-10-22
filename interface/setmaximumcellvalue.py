@@ -1,13 +1,20 @@
+#!/usr/bin/env python3
+
+''' Maximum Cell Value Dialog '''
+
 from tkinter import (Toplevel)
 from tkinter.ttk import (Style, Label, Button, Entry)
 from tkinter.messagebox import showerror
+
 from interface import (loadIcon, IIVLXICO)
 
 class SetMaximumCellValue(Toplevel):
+    ''' SetMaximumCellValue Dialog Window '''
     WINDOW_WIDTH = 300
     WINDOW_HEIGHT = 80
     WINDOW_RESIZABLE = (False, False)
     WINDOW_TITLE = "Set maximum cell value"
+    
     def __init__(self, master, **kw):
         Toplevel.__init__(self, master, **kw)
         self.style = Style()
@@ -17,8 +24,7 @@ class SetMaximumCellValue(Toplevel):
         loadIcon(self.tk, self, IIVLXICO)
         self.title(self.WINDOW_TITLE)
         self.resizable(*self.WINDOW_RESIZABLE)
-        self.geometry('{0:d}x{1:d}+{2:d}+{3:d}'.format(
-                      self.WINDOW_WIDTH, self.WINDOW_HEIGHT, x,y))
+        self.geometry(f'{self.WINDOW_WIDTH}x{self.WINDOW_HEIGHT}+{x}+{y}')
         # grid configure
         self.grid_rowconfigure(0, weight=1)
         self.grid_rowconfigure(1, weight=0)
@@ -36,6 +42,7 @@ class SetMaximumCellValue(Toplevel):
         self.draw()
         # wait for the window to close and return to master
         self.wait_window()
+        
     def configureStyles(self):
         self.style.configure('SetExecutionDelay.TButton', font='Segoe 8', height=3, width=10, anchor='center', padding=2)
         self.style.configure('SetExecutionDelay.TLabel', font='Segoe 8')
@@ -62,7 +69,6 @@ class SetMaximumCellValue(Toplevel):
                 self.close()
                 return
         showerror("Invalid entry", "Please enter an integer value greater than 0.")
-            
         
     def close(self):
         ''' Close this dialog and return to parent window '''

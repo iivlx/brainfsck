@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+
 ''' brainfsck
 Brainfsck interpreter
  
@@ -10,6 +11,7 @@ __date__ = (22,10,2019) #d,Wm,y
 __version__ = (0,0,1) #0.0.1
 
 from tkinter import Tk
+
 from interface import Brainfsck
 from engine import BrainfsckEngine
 

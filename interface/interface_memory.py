@@ -1,9 +1,12 @@
+#!/usr/bin/env python3
+
+''' Memory View Window '''
+
 from tkinter import (Toplevel, Text)
 from tkinter.ttk import (Style, Frame, Label, PanedWindow, Button, Combobox, Entry, Separator)
 from tkinter.constants import LEFT, SEL, INSERT, DISABLED, NORMAL, END, CENTER, YES, ACTIVE, SUNKEN, RIGHT
 
 from interface import (loadIcon, IIVLXICO, __version__)
-
 from interface.setmaximumcellvalue import SetMaximumCellValue
 
      
